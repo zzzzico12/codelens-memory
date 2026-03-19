@@ -90,9 +90,15 @@ func TestEngineContext(t *testing.T) {
 func TestEngineStats(t *testing.T) {
 	engine := newTestEngine(t)
 
-	engine.Save("d1", "content", "decision", "session", "", "")
-	engine.Save("b1", "content", "bugfix", "session", "", "")
-	engine.Save("b2", "content", "bugfix", "session", "", "")
+	if _, err := engine.Save("d1", "content", "decision", "session", "", ""); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := engine.Save("b1", "content", "bugfix", "session", "", ""); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := engine.Save("b2", "content", "bugfix", "session", "", ""); err != nil {
+		t.Fatal(err)
+	}
 
 	stats, err := engine.Stats()
 	if err != nil {

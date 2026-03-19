@@ -84,7 +84,9 @@ func TestExists(t *testing.T) {
 	store := openTestStore(t)
 	defer store.Close()
 
-	store.Save(&Memory{Title: "test", Content: "content", Category: "context", Source: "git-commit", SourceRef: "abc123", CreatedAt: time.Now()})
+	if _, err := store.Save(&Memory{Title: "test", Content: "content", Category: "context", Source: "git-commit", SourceRef: "abc123", CreatedAt: time.Now()}); err != nil {
+		t.Fatal(err)
+	}
 
 	exists, err := store.Exists("abc123")
 	if err != nil {
@@ -107,8 +109,12 @@ func TestStats(t *testing.T) {
 	store := openTestStore(t)
 	defer store.Close()
 
-	store.Save(&Memory{Title: "d1", Content: "c", Category: "decision", Source: "test", CreatedAt: time.Now()})
-	store.Save(&Memory{Title: "b1", Content: "c", Category: "bugfix", Source: "test", CreatedAt: time.Now()})
+	if _, err := store.Save(&Memory{Title: "d1", Content: "c", Category: "decision", Source: "test", CreatedAt: time.Now()}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.Save(&Memory{Title: "b1", Content: "c", Category: "bugfix", Source: "test", CreatedAt: time.Now()}); err != nil {
+		t.Fatal(err)
+	}
 
 	stats, err := store.Stats()
 	if err != nil {
