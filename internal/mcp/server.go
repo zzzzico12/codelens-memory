@@ -226,7 +226,12 @@ func (s *Server) toolSearch(args json.RawMessage) toolResult {
 		Query string `json:"query"`
 		Limit int    `json:"limit"`
 	}
-	json.Unmarshal(args, &input)
+	if err := json.Unmarshal(args, &input); err != nil {
+		return toolResult{
+			Content: []toolContent{{Type: "text", Text: "Invalid arguments: " + err.Error()}},
+			IsError: true,
+		}
+	}
 	if input.Limit <= 0 {
 		input.Limit = 10
 	}
@@ -263,7 +268,12 @@ func (s *Server) toolSave(args json.RawMessage) toolResult {
 		Category string `json:"category"`
 		Tags     string `json:"tags"`
 	}
-	json.Unmarshal(args, &input)
+	if err := json.Unmarshal(args, &input); err != nil {
+		return toolResult{
+			Content: []toolContent{{Type: "text", Text: "Invalid arguments: " + err.Error()}},
+			IsError: true,
+		}
+	}
 
 	if input.Title == "" || input.Content == "" {
 		return toolResult{
@@ -293,7 +303,12 @@ func (s *Server) toolContext(args json.RawMessage) toolResult {
 		WorkingDir string `json:"working_dir"`
 		MaxTokens  int    `json:"max_tokens"`
 	}
-	json.Unmarshal(args, &input)
+	if err := json.Unmarshal(args, &input); err != nil {
+		return toolResult{
+			Content: []toolContent{{Type: "text", Text: "Invalid arguments: " + err.Error()}},
+			IsError: true,
+		}
+	}
 	if input.MaxTokens <= 0 {
 		input.MaxTokens = 2000
 	}
@@ -442,7 +457,7 @@ func (s *Server) ServeSSE(addr string) error {
 		mu.Unlock()
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(resp)
+		_ = json.NewEncoder(w).Encode(resp)
 	})
 
 	return http.ListenAndServe(addr, mux)

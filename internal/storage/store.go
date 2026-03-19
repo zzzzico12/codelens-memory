@@ -261,7 +261,7 @@ func (s *Store) Stats() (*Stats, error) {
 
 	// Last updated
 	var lastUpdated sql.NullTime
-	s.db.QueryRow("SELECT MAX(updated_at) FROM memories").Scan(&lastUpdated)
+	_ = s.db.QueryRow("SELECT MAX(updated_at) FROM memories").Scan(&lastUpdated)
 	if lastUpdated.Valid {
 		stats.LastUpdated = lastUpdated.Time
 	}

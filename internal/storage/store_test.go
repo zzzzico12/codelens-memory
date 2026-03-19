@@ -61,9 +61,15 @@ func TestSearchByCategory(t *testing.T) {
 	defer store.Close()
 
 	// Save memories in different categories
-	store.Save(&Memory{Title: "Decision 1", Content: "content", Category: "decision", Source: "test", CreatedAt: time.Now()})
-	store.Save(&Memory{Title: "Bugfix 1", Content: "content", Category: "bugfix", Source: "test", CreatedAt: time.Now()})
-	store.Save(&Memory{Title: "Decision 2", Content: "content", Category: "decision", Source: "test", CreatedAt: time.Now()})
+	if _, err := store.Save(&Memory{Title: "Decision 1", Content: "content", Category: "decision", Source: "test", CreatedAt: time.Now()}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.Save(&Memory{Title: "Bugfix 1", Content: "content", Category: "bugfix", Source: "test", CreatedAt: time.Now()}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.Save(&Memory{Title: "Decision 2", Content: "content", Category: "decision", Source: "test", CreatedAt: time.Now()}); err != nil {
+		t.Fatal(err)
+	}
 
 	results, err := store.SearchByCategory("decision", 10)
 	if err != nil {

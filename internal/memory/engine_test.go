@@ -59,9 +59,15 @@ func TestEngineContext(t *testing.T) {
 	engine := newTestEngine(t)
 
 	// Save some memories in different categories
-	engine.Save("Use 2-space indent", "All files use 2-space indentation", "convention", "session", "", "")
-	engine.Save("Choose Redis for cache", "Redis chosen over Memcached for pub/sub support", "decision", "session", "", "")
-	engine.Save("Recent work on auth", "Implemented OAuth2 PKCE flow for mobile app", "context", "session", "", "")
+	if _, err := engine.Save("Use 2-space indent", "All files use 2-space indentation", "convention", "session", "", ""); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := engine.Save("Choose Redis for cache", "Redis chosen over Memcached for pub/sub support", "decision", "session", "", ""); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := engine.Save("Recent work on auth", "Implemented OAuth2 PKCE flow for mobile app", "context", "session", "", ""); err != nil {
+		t.Fatal(err)
+	}
 
 	ctx, err := engine.Context(".", 2000)
 	if err != nil {
