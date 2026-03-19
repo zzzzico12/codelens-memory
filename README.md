@@ -5,6 +5,10 @@
 <h1 align="center">CodeLens Memory</h1>
 
 <p align="center">
+  <a href="README.ja.md">日本語</a> | English
+</p>
+
+<p align="center">
   <strong>Your AI coding tools forget everything. This fixes that.</strong>
 </p>
 
