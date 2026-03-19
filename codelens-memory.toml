@@ -1,0 +1,40 @@
+[memory]
+# Where to store the memory database
+path = ".codelens/memory.db"
+
+# Cross-project shared memory (optional)
+# shared_path = "~/.codelens/shared.db"
+
+[embeddings]
+# "ollama" (default, local) | "openai" | "none"
+provider = "ollama"
+
+# Model for generating embeddings
+model = "nomic-embed-text"
+
+# Ollama server URL
+ollama_url = "http://localhost:11434"
+
+# Only needed for cloud providers
+# api_key = ""
+
+[ingest]
+# Max commits to process on first ingest
+max_commits = 5000
+
+# Include merge commits
+include_merge_commits = false
+
+# File patterns to ignore during analysis
+ignore_patterns = ["*.lock", "*.min.js", "*.min.css", "node_modules/**", "vendor/**", ".git/**"]
+
+[context]
+# Max tokens to inject at session start
+max_context_tokens = 2000
+
+# How many memories to consider for context
+top_k = 10
+
+[server]
+# Default SSE port (when using --sse without a port)
+default_port = 8377
