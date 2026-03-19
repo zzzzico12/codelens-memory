@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 // Memory represents a single stored memory entry.
@@ -39,9 +40,14 @@ type Store struct {
 
 // Open creates or opens a memory database at the given path.
 func Open(path string) (*Store, error) {
-	db, err := sql.Open("sqlite3", path+"?_journal_mode=WAL&_busy_timeout=5000")
+	db, err := sql.Open("sqlite", path)
 	if err != nil {
 		return nil, fmt.Errorf("open database: %w", err)
+	}
+
+	if _, err := db.Exec("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;"); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("set pragmas: %w", err)
 	}
 
 	s := &Store{db: db, path: path}
@@ -121,8 +127,27 @@ func (s *Store) Save(m *Memory) (int64, error) {
 	return res.LastInsertId()
 }
 
+// buildFTSQuery converts a plain-text query into an FTS5 OR expression so that
+// any matching term returns results (recall-oriented search).
+func buildFTSQuery(query string) string {
+	terms := strings.Fields(query)
+	if len(terms) == 0 {
+		return ""
+	}
+	quoted := make([]string, len(terms))
+	for i, t := range terms {
+		// Quote each term; escape internal double-quotes per FTS5 spec.
+		quoted[i] = `"` + strings.ReplaceAll(t, `"`, `""`) + `"`
+	}
+	return strings.Join(quoted, " OR ")
+}
+
 // Search performs full-text search and returns matching memories.
 func (s *Store) Search(query string, limit int) ([]Memory, error) {
+	ftsQuery := buildFTSQuery(query)
+	if ftsQuery == "" {
+		return nil, nil
+	}
 	rows, err := s.db.Query(`
 		SELECT m.id, m.title, m.content, m.category, m.source, m.source_ref,
 		       m.tags, m.created_at, m.updated_at,
@@ -132,7 +157,7 @@ func (s *Store) Search(query string, limit int) ([]Memory, error) {
 		WHERE memories_fts MATCH ?
 		ORDER BY score
 		LIMIT ?
-	`, query, limit)
+	`, ftsQuery, limit)
 	if err != nil {
 		return nil, fmt.Errorf("search: %w", err)
 	}

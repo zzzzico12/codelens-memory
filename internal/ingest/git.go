@@ -218,6 +218,12 @@ func classifyCommit(c commit) string {
 		return "" // Skip short trivial commits
 	}
 
+	// A single weak pattern match on a long descriptive commit is likely
+	// incidental — classify as context rather than a specific category.
+	if bestScore == 1 && len(c.subject+c.body) > 100 {
+		return "context"
+	}
+
 	return best
 }
 
